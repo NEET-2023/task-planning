@@ -26,4 +26,9 @@ class ValueFunction:
 
     def value_at(self, x, y):
         return self.map[x][y]
-        
+    
+    def print_map(self):
+        for i in range(self.height):
+            for j in range(self.width):
+                print(self.map[i][j], end =" ")
+            print("")

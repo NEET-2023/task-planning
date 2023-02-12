@@ -2,7 +2,7 @@ import math
 
 def grad_gen(sen_x,sen_y):
     def gradient(x,y):
-        return 1/math.dist([sen_x,sen_y],[x,y])
+        return -1/(math.dist([sen_x,sen_y],[x,y]) + 0.01)
     return gradient
 
 def get_gen(map):
