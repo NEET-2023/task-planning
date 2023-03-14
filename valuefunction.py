@@ -1,7 +1,8 @@
 import numpy as np
+import rospy
 
 class ValueFunction:
-    def __init__(self, variables, height, width, zipper):
+    def __init__(self, variables: int, height: int, width: int, zipper):
         self.best = 0
         self.bestx = 0
         self.besty = 0
@@ -10,7 +11,11 @@ class ValueFunction:
         self.width = width
         self.map = np.zeros((variables, height, width))
         self.zipper = zipper
-        
+        self.map_pub = rospy.Publisher('/map_topic', Range, queue_size=1)
+
+    def get_dims(self):
+        return (self.variables, self.height, self.width)
+
     def apply_func(self, func, v):
         for i in range(self.height):
             for j in range(self.width):
@@ -38,3 +43,4 @@ class ValueFunction:
             for j in range(self.width):
                 print(self.zipper(self.map[:, i, j]), end =" ")
             print("")
+        print("")
