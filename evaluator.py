@@ -2,11 +2,11 @@ from generator import *
 from valuefunction import *
 
 class Evaluator:
-    def __init__(self, eval: ValueFunction, sensors: int):
+    def __init__(self, vf: ValueFunction, sensors: int, occupancy):
         self.vf = vf
         self.sensors = sensors
         variables, height, width = vf.get_dims()
-        self.map = np.zeros((height, width))
+        self.occupancy = occupancy
         self.placements = np.zeros((height, width))
 
     def place_one(self):
@@ -31,8 +31,8 @@ class Evaluator:
     def get_dims(self):
         return self.vf.get_dims()
 
-    def get_map(self):
-        return self.map
+    def get_occupancy(self):
+        return self.occupancy
     
     def get_placements(self):
         for i in range(self.sensors):
