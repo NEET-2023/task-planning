@@ -11,7 +11,6 @@ class ValueFunction:
         self.width = width
         self.map = np.zeros((variables, height, width))
         self.zipper = zipper
-        self.map_pub = rospy.Publisher('/map_topic', Range, queue_size=1)
 
     def get_dims(self):
         return (self.variables, self.height, self.width)

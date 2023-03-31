@@ -3,7 +3,8 @@ from evaluator import *
 import cv2
 import rospy
 from geometry_msgs.msg import Point
-from geometry_msgs.msg import OccupancyGrid
+from nav_msgs.msg import OccupancyGrid
+from sensor_msgs.msg import Range
 
 starting = 0
 flying = 1
@@ -71,8 +72,7 @@ class TaskPlanner:
         self.map_pub.publish(grid)
 
 if __name__ == "__main__":
-    path = '../occupancy_grids/images/rolling_hills_map_10.png'
-    occupancy_image = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2GRAY)
+    occupancy_image = [[0, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 0], [0, 1, 0, 1, 0], [0, 0, 0, 0, 0]]
     vf = ValueFunction(2, len(occupancy_image), len(occupancy_image[0]), zipper_gen([0.4, 0.6]))
 
     info0 = get_gen([[1, 2, 3, 4, 5], [4, 5, 6, 7, 8], [7, 8, 9, 10, 11], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
