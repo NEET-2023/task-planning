@@ -19,7 +19,7 @@ class TaskPlanner:
         self.resolution = 1
         self.northedge = 0
         self.westedge = 0
-
+        self.rate = rospy.Rate(1)
         self.state = starting
         self.placements = []
         self.current_sensor = 0
@@ -31,14 +31,17 @@ class TaskPlanner:
 
     def tick(self):
         #state machine logic goes here
-        if self.state == starting:
-            self.placements = self.eval.get_placements()
-            self.publish_occupancy()
-            self.state = flying
-            return
-        if self.state == flying:
-            self.publish_waypoint()
-            return
+        while True:
+            self.rate.sleep()
+            if self.state == starting:
+                self.placements = self.eval.get_placements()
+                self.publish_occupancy()
+                self.state = flying
+                continue
+            if self.state == flying:
+                self.publish_waypoint()
+                continue
+        
         
     def waypoint_reached(self):
         self.current_sensor += 1
@@ -87,6 +90,6 @@ if __name__ == "__main__":
         # create the navigator object, pass in important mapping information
         rospy.init_node('task_planner', anonymous=True)
         PLANNER = TaskPlanner(eval)
-        rospy.spin()
+        PLANNER.tick()
     except rospy.ROSInterruptException:
         pass
