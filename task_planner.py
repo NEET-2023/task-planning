@@ -5,6 +5,7 @@ import rospy
 from geometry_msgs.msg import Point
 from nav_msgs.msg import OccupancyGrid
 from sensor_msgs.msg import Range
+from nav_msgs.msg import Odometry
 
 starting = 0
 flying = 1
@@ -24,6 +25,7 @@ class TaskPlanner:
         self.current_sensor = 0
         self.eval = eval
         self.variables, self.height, self.width = eval.get_dims()
+        self.odom_sub = rospy.Subscriber('/ground_truth/state', Odometry, self.tick)
         self.map_pub = rospy.Publisher('/map_topic', Range, queue_size=1)
         self.waypoint_pub = rospy.Publisher('/waypoint_topic', Point, queue_size=1)
 
