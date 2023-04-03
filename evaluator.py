@@ -5,9 +5,9 @@ class Evaluator:
     def __init__(self, vf: ValueFunction, sensors: int, occupancy):
         self.vf = vf
         self.sensors = sensors
-        variables, height, width = vf.get_dims()
+        self.variables, self.height, self.width = vf.get_dims()
         self.occupancy = occupancy
-        self.placements = np.zeros((height, width))
+        self.placements = np.zeros((self.height, self.width))
 
     def place_one(self):
         x, y, val = self.vf.best_coords()
