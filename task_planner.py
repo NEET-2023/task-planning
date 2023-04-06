@@ -26,7 +26,7 @@ class TaskPlanner:
         self.eval = eval
         self.variables, self.height, self.width = eval.get_dims()
         self.odom_sub = rospy.Subscriber('/ground_truth/state', Odometry, self.tick)
-        self.map_pub = rospy.Publisher('/map_topic', Range, queue_size=1)
+        self.map_pub = rospy.Publisher('/map_topic', OccupancyGrid, queue_size=1)
         self.waypoint_pub = rospy.Publisher('/waypoint_topic', Point32, queue_size=1)
 
     def tick(self):
