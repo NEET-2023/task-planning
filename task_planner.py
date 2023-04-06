@@ -1,8 +1,9 @@
 from generator import *
 from evaluator import *
+import skimage.measure
 import cv2
 import rospy
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point32
 from nav_msgs.msg import OccupancyGrid
 from sensor_msgs.msg import Range
 from nav_msgs.msg import Odometry
@@ -27,7 +28,7 @@ class TaskPlanner:
         self.variables, self.height, self.width = eval.get_dims()
         self.odom_sub = rospy.Subscriber('/ground_truth/state', Odometry, self.tick)
         self.map_pub = rospy.Publisher('/map_topic', OccupancyGrid, queue_size=1)
-        self.waypoint_pub = rospy.Publisher('/waypoint_topic', Point, queue_size=1)
+        self.waypoint_pub = rospy.Publisher('/waypoint_topic', Point32, queue_size=1)
 
     def tick(self):
         #state machine logic goes here
@@ -54,7 +55,7 @@ class TaskPlanner:
         self.state = flying
 
     def publish_waypoint(self):
-        waypoint = Point()
+        waypoint = Point32()
         waypoint.x = self.placements[self.current_sensor][0]
         waypoint.y = self.placements[self.current_sensor][1]
         waypoint.z = 0
@@ -77,14 +78,19 @@ class TaskPlanner:
         self.map_pub.publish(grid)
 
 if __name__ == "__main__":
-    occupancy_image = [[0, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 0], [0, 1, 0, 1, 0], [0, 0, 0, 0, 0]]
+    path = '../occupancy_grids/images/rolling_hills_map_10.png'
+    occupancy_image = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2GRAY)
+    # cv2.imshow("original occupancy", occupancy_image)
+    reduced_occupancy = skimage.measure.block_reduce(occupancy_image, (5, 5), np.max)
+    # cv2.imshow('reduced occupancy', reduced_occupancy)
+    dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((7, 7), np.uint8))
     vf = ValueFunction(2, len(occupancy_image), len(occupancy_image[0]), zipper_gen([0.4, 0.6]))
 
-    info0 = get_gen([[1, 2, 3, 4, 5], [4, 5, 6, 7, 8], [7, 8, 9, 10, 11], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
-    info1 = get_gen([[5, 4, 3, 2, 1], [8, 7, 6, 5, 4], [11, 10, 9, 8, 7], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
-    vf.apply_func(info0, 0)
-    vf.apply_func(info1, 1)
-    eval = Evaluator(vf, 5, occupancy_image)
+    #info0 = get_gen([[1, 2, 3, 4, 5], [4, 5, 6, 7, 8], [7, 8, 9, 10, 11], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
+    #info1 = get_gen([[5, 4, 3, 2, 1], [8, 7, 6, 5, 4], [11, 10, 9, 8, 7], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
+    #vf.apply_func(info0, 0)
+    #vf.apply_func(info1, 1)
+    eval = Evaluator(vf, 5, dilated_occupancy)
 
     try:
         # create the navigator object, pass in important mapping information
