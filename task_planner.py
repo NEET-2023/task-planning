@@ -7,6 +7,7 @@ from geometry_msgs.msg import Point32
 from nav_msgs.msg import OccupancyGrid
 from sensor_msgs.msg import Range
 from nav_msgs.msg import Odometry
+from std_msgs.msg import Bool
 
 starting = 0
 flying = 1
@@ -26,7 +27,7 @@ class TaskPlanner:
         self.current_sensor = 0
         self.eval = eval
         self.variables, self.height, self.width = eval.get_dims()
-        self.odom_sub = rospy.Subscriber('/ground_truth/state', Odometry, self.tick)
+        self.odom_sub = rospy.Subscriber('/done_travelling', Bool, self.waypoint_reached)
         self.map_pub = rospy.Publisher('/map_topic', OccupancyGrid, queue_size=1)
         self.waypoint_pub = rospy.Publisher('/waypoint_topic', Point32, queue_size=1)
 
@@ -44,9 +45,10 @@ class TaskPlanner:
                 continue
         
         
-    def waypoint_reached(self):
-        self.current_sensor += 1
-        self.state = dropping
+    def waypoint_reached(self, is_reached):
+        if is_reached.data:
+            self.current_sensor += 1
+            #self.state = dropping
 
     def dropped(self):
         if self.current_sensor == len(self.placements):
