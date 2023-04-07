@@ -3,7 +3,7 @@ from evaluator import *
 import skimage.measure
 import cv2
 import rospy
-from geometry_msgs.msg import Point32
+from geometry_msgs.msg import Point
 from nav_msgs.msg import OccupancyGrid
 from sensor_msgs.msg import Range
 from nav_msgs.msg import Odometry
@@ -29,7 +29,7 @@ class TaskPlanner:
         self.variables, self.height, self.width = eval.get_dims()
         self.odom_sub = rospy.Subscriber('/done_travelling', Bool, self.waypoint_reached)
         self.map_pub = rospy.Publisher('/map_topic', OccupancyGrid, queue_size=1)
-        self.waypoint_pub = rospy.Publisher('/waypoint_topic', Point32, queue_size=1)
+        self.waypoint_pub = rospy.Publisher('/waypoint_topic', Point, queue_size=1)
 
     def tick(self):
         #state machine logic goes here
@@ -57,14 +57,14 @@ class TaskPlanner:
         self.state = flying
 
     def publish_waypoint(self):
-        waypoint = Point32()
+        waypoint = Point()
         waypoint.x = self.placements[self.current_sensor][0]
         waypoint.y = self.placements[self.current_sensor][1]
         waypoint.z = 0
         self.waypoint_pub.publish(waypoint)
 
     def publish_occupancy(self):
-        northwest = Point32()
+        northwest = Point()
         northwest.x = self.northedge
         northwest.y = self.westedge
         northwest.z = 0
