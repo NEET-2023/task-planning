@@ -64,7 +64,7 @@ class TaskPlanner:
         self.waypoint_pub.publish(waypoint)
 
     def publish_occupancy(self):
-        northwest = Point()
+        northwest = Point32()
         northwest.x = self.northedge
         northwest.y = self.westedge
         northwest.z = 0
@@ -80,7 +80,7 @@ class TaskPlanner:
         self.map_pub.publish(grid)
 
 if __name__ == "__main__":
-    path = '../occupancy_grids/images/rolling_hills_map_10.png'
+    path = 'occupancy_grids/images/rolling_hills_map_10.png'
     occupancy_image = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2GRAY)
     # cv2.imshow("original occupancy", occupancy_image)
     reduced_occupancy = skimage.measure.block_reduce(occupancy_image, (5, 5), np.max)
