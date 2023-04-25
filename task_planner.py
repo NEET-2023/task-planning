@@ -13,54 +13,109 @@ starting = 0
 flying = 1
 dropping = 2
 picking = 3
+recharge = 4
 returning = 5
+done = 6
 
 class TaskPlanner:
     
     def __init__(self, eval: Evaluator):
+        self.home = Point()
+        self.home.x = 0
+        self.home.y = 0
+        self.home.z = 0
+        self.has_probe = True
+        self.final_drop = False
         self.resolution = 1
         self.northedge = 0
         self.westedge = 0
         self.rate = rospy.Rate(1)
+        self.prev_state = None
         self.state = starting
         self.placements = []
         self.current_sensor = 0
         self.eval = eval
         self.variables, self.height, self.width = eval.get_dims()
-        self.odom_sub = rospy.Subscriber('/done_travelling', Bool, self.waypoint_reached)
+        # ROS publishers to execute other nodes
         self.map_pub = rospy.Publisher('/map_topic', OccupancyGrid, queue_size=1)
         self.waypoint_pub = rospy.Publisher('/waypoint_topic', Point, queue_size=1)
+        self.place_sensor_pub = rospy.Publisher('/place_sensor', Bool, queue_size=1)
+        self.pickup_sensor_pub = rospy.Publisher('/pickup_sensor', Bool, queue_size=1)
+        # ROS subscribers to run this script
+        self.odom_sub = rospy.Subscriber('/ground_truth/state', Odometry, self.tick)
+        self.done_travelling_sub = rospy.Subscriber('done_travelling', Bool, self.waypoint_reached)
+        self.sensor_placed_sub = rospy.Subscriber('/sensor_placed', Bool, self.done_dilly_dallying)
+        self.sensor_pickedup_sub = rospy.Subscriber('/sensor_pickedup', Bool, self.done_dilly_dallying)
 
-    def tick(self):
+    def tick(self, odom):
         #state machine logic goes here
         while True:
             self.rate.sleep()
             if self.state == starting:
                 self.placements = self.eval.get_placements()
                 self.publish_occupancy()
-                self.state = flying
+                self.set_state(flying)
                 continue
             if self.state == flying:
-                self.publish_waypoint()
+                self.publish_next()
+                continue
+            if self.state == dropping:
+                self.drop()
+                continue
+            if self.state == picking:
+                self.pick()
+                continue
+            if self.state == recharge:
+                continue
+            if self.state == returning:
+                self.publish_waypoint(self.home)
                 continue
         
         
     def waypoint_reached(self, is_reached):
         if is_reached.data:
-            self.current_sensor += 1
-            #self.state = dropping
+            if self.state == flying:
+                self.current_sensor += 1
+            if self.state == returning and self.current_sensor == len(self.placements):
+                if self.has_probe:
+                    self.final_drop = True
+                    self.set_state(dropping)
+                    return
+                self.current_sensor = 0
+                self.set_state(flying)
+            elif self.has_probe:
+                self.set_state(dropping)
+            else:
+                self.set_state(picking)
 
-    def dropped(self):
-        if self.current_sensor == len(self.placements):
-            self.state = returning
-            return
-        self.state = flying
+    def drop(self):
+        drop = Bool()
+        drop.data = True
+        self.place_sensor_pub.publish(drop)
 
-    def publish_waypoint(self):
+    def done_dilly_dallying(self, done):
+        if done.data:
+            if self.final_drop:
+                self.set_state(done)
+                return
+            if self.prev_state == flying:
+                self.set_state(returning)
+                return
+            self.set_state(flying)
+
+    def pick(self):
+        pick = Bool()
+        pick.data = True
+        self.pickup_sensor_pub.publish(pick)
+
+    def publish_next(self):
         waypoint = Point()
         waypoint.x = self.placements[self.current_sensor][0]
         waypoint.y = self.placements[self.current_sensor][1]
         waypoint.z = 0
+        self.publish_waypoint(waypoint)
+
+    def publish_waypoint(self, waypoint):
         self.waypoint_pub.publish(waypoint)
 
     def publish_occupancy(self):
@@ -78,6 +133,10 @@ class TaskPlanner:
         grid.info.height = self.height
         grid.info.origin.position = northwest
         self.map_pub.publish(grid)
+    
+    def set_state(self, new_state):
+        self.prev_state = self.state
+        self.state = new_state
 
 if __name__ == "__main__":
     path = 'occupancy_grids/images/rolling_hills_map_10.png'
