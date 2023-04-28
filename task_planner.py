@@ -8,6 +8,7 @@ from nav_msgs.msg import OccupancyGrid
 from sensor_msgs.msg import Range
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Bool
+from std_msgs.msg import Int16
 
 starting = 0
 flying = 1
@@ -41,15 +42,22 @@ class TaskPlanner:
         self.waypoint_pub = rospy.Publisher('/waypoint_topic', Point, queue_size=1)
         self.place_sensor_pub = rospy.Publisher('/place_sensor', Bool, queue_size=1)
         self.pickup_sensor_pub = rospy.Publisher('/pickup_sensor', Bool, queue_size=1)
+        self.state_pub = rospy.Publisher('/state', Int16, queue_size=1)
         # ROS subscribers to run this script
         self.odom_sub = rospy.Subscriber('/ground_truth/state', Odometry, self.tick)
         self.done_travelling_sub = rospy.Subscriber('done_travelling', Bool, self.waypoint_reached)
         self.sensor_placed_sub = rospy.Subscriber('/sensor_placed', Bool, self.done_dilly_dallying)
         self.sensor_pickedup_sub = rospy.Subscriber('/sensor_pickedup', Bool, self.done_dilly_dallying)
 
+    def publish_state(self):
+        wrapper = Int16()
+        wrapper.data = self.state
+        self.state_pub.publish(wrapper)
+
     def tick(self, odom):
         #state machine logic goes here
         self.rate.sleep()
+        self.publish_state
         if self.state == starting:
             self.placements = self.eval.get_placements()
             self.publish_occupancy()
