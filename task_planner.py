@@ -49,27 +49,26 @@ class TaskPlanner:
 
     def tick(self, odom):
         #state machine logic goes here
-        while True:
-            self.rate.sleep()
-            if self.state == starting:
-                self.placements = self.eval.get_placements()
-                self.publish_occupancy()
-                self.set_state(flying)
-                continue
-            if self.state == flying:
-                self.publish_next()
-                continue
-            if self.state == dropping:
-                self.drop()
-                continue
-            if self.state == picking:
-                self.pick()
-                continue
-            if self.state == recharge:
-                continue
-            if self.state == returning:
-                self.publish_waypoint(self.home)
-                continue
+        self.rate.sleep()
+        if self.state == starting:
+            self.placements = self.eval.get_placements()
+            self.publish_occupancy()
+            self.set_state(flying)
+            return
+        if self.state == flying:
+            self.publish_next()
+            return
+        if self.state == dropping:
+            self.drop()
+            return
+        if self.state == picking:
+            self.pick()
+            return
+        if self.state == recharge:
+            return
+        if self.state == returning:
+            self.publish_waypoint(self.home)
+            return
         
         
     def waypoint_reached(self, is_reached):
@@ -157,6 +156,6 @@ if __name__ == "__main__":
         # create the navigator object, pass in important mapping information
         rospy.init_node('task_planner', anonymous=True)
         PLANNER = TaskPlanner(eval)
-        PLANNER.tick()
+        rospy.spin()
     except rospy.ROSInterruptException:
         pass
