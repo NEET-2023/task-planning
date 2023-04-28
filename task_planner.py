@@ -56,8 +56,7 @@ class TaskPlanner:
 
     def tick(self, odom):
         #state machine logic goes here
-        self.rate.sleep()
-        self.publish_state
+        self.publish_state()
         if self.state == starting:
             self.placements = self.eval.get_placements()
             self.publish_occupancy()
