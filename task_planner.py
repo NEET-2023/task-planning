@@ -135,7 +135,7 @@ class TaskPlanner:
         occupancy = self.eval.get_occupancy()
         for row in occupancy:
             for value in row:
-                grid.data.append(math.floor(value))
+                grid.data.append(int(value))
         grid.info.resolution = self.resolution
         grid.info.width = self.width
         grid.info.height = self.height
