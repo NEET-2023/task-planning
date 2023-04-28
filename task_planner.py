@@ -118,8 +118,8 @@ class TaskPlanner:
 
     def publish_next(self):
         waypoint = Point()
-        waypoint.x = self.placements[self.current_sensor][0]
-        waypoint.y = self.placements[self.current_sensor][1]
+        waypoint.x = self.placements[self.current_sensor][0] - 100
+        waypoint.y = self.placements[self.current_sensor][1] - 100
         waypoint.z = 0
         self.publish_waypoint(waypoint)
 
