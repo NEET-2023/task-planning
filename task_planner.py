@@ -135,7 +135,7 @@ class TaskPlanner:
         occupancy = self.eval.get_occupancy()
         for row in occupancy:
             for value in row:
-                grid.data.append(int(value))
+                grid.data.append(int(value/3))
         grid.info.resolution = self.resolution
         grid.info.width = self.width
         grid.info.height = self.height
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     #info1 = get_gen([[5, 4, 3, 2, 1], [8, 7, 6, 5, 4], [11, 10, 9, 8, 7], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
     #vf.apply_func(info0, 0)
     #vf.apply_func(info1, 1)
-    eval = Evaluator(vf, 5, dilated_occupancy)
+    eval = Evaluator(vf, 2, dilated_occupancy)
 
     try:
         # create the navigator object, pass in important mapping information
