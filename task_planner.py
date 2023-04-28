@@ -1,5 +1,6 @@
 from generator import *
 from evaluator import *
+import math
 import skimage.measure
 import cv2
 import rospy
@@ -57,6 +58,7 @@ class TaskPlanner:
     def tick(self, odom):
         #state machine logic goes here
         self.publish_state()
+        #self.publish_occupancy()
         if self.state == starting:
             self.placements = self.eval.get_placements()
             self.publish_occupancy()
@@ -133,7 +135,7 @@ class TaskPlanner:
         occupancy = self.eval.get_occupancy()
         for row in occupancy:
             for value in row:
-                grid.data.append(value)
+                grid.data.append(math.floor(value))
         grid.info.resolution = self.resolution
         grid.info.width = self.width
         grid.info.height = self.height
