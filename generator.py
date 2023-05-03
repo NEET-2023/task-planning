@@ -21,6 +21,11 @@ def set_func(bad_x,bad_y, value):
             return 0
     return set
 
+def sin_gen(scalar, shiftx, shifty):
+    def sin(x,y):
+        return scalar * (sin(x + shiftx) + sin(y + shifty))
+    return sin
+
 def get_gen(map):
     def get_value(x,y):
         return map[x][y]

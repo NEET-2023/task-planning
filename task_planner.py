@@ -103,6 +103,7 @@ class TaskPlanner:
 
     def done_dilly_dallying(self, done):
         if done.data:
+            self.has_probe = not self.has_probe
             if self.final_drop:
                 self.set_state(done)
                 return
