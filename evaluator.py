@@ -7,6 +7,8 @@ class Evaluator:
         self.sensors = sensors
         self.variables, self.height, self.width = vf.get_dims()
         self.occupancy = occupancy
+        impassables = neg_get_gen(occupancy)
+        self.vf.apply_func_all(impassables)
         self.placements = np.zeros((self.height, self.width))
 
     def place_one(self):

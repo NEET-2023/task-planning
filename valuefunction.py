@@ -1,5 +1,4 @@
 import numpy as np
-import rospy
 
 class ValueFunction:
     def __init__(self, variables: int, height: int, width: int, zipper):

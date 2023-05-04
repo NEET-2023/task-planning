@@ -22,9 +22,9 @@ def set_func(bad_x,bad_y, value):
     return set
 
 def sin_gen(scalar, shiftx, shifty):
-    def sin(x,y):
-        return scalar * (sin(x + shiftx) + sin(y + shifty))
-    return sin
+    def sinfnc(x,y):
+        return scalar * (math.sin(x + shiftx) + math.sin(y + shifty))
+    return sinfnc
 
 def planar_gen(a, b, shiftx, shifty):
     def plane(x,y):
@@ -36,3 +36,7 @@ def get_gen(map):
         return map[x][y]
     return get_value
 
+def neg_get_gen(map):
+    def get_value(x,y):
+        return -map[x][y]
+    return get_value
