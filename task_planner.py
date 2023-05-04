@@ -82,6 +82,8 @@ class TaskPlanner:
         
     def waypoint_reached(self, is_reached):
         if is_reached.data:
+            if self.state == dropping or self.state == picking:
+                return
             if self.state == flying:
                 self.current_sensor += 1
             if self.state == returning and self.current_sensor == len(self.placements): #gone through sensor list
@@ -103,14 +105,15 @@ class TaskPlanner:
 
     def done_dilly_dallying(self, done):
         if done.data:
-            self.has_probe = not self.has_probe
+            if self.state == dropping or self.state == picking:
+                self.has_probe = not self.has_probe
             if self.final_drop:
                 self.set_state(mission_complete)
                 return
             if self.prev_state == flying:
                 self.set_state(returning)
-                return
-            self.set_state(flying)
+            elif self.prev_state == returning:
+                self.set_state(flying)
 
     def pick(self):
         pick = Bool()

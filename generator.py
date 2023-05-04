@@ -26,6 +26,11 @@ def sin_gen(scalar, shiftx, shifty):
         return scalar * (sin(x + shiftx) + sin(y + shifty))
     return sin
 
+def planar_gen(a, b, shiftx, shifty):
+    def plane(x,y):
+        return (a*x+shiftx + b*y+shifty)
+    return plane
+
 def get_gen(map):
     def get_value(x,y):
         return map[x][y]
