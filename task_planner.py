@@ -157,7 +157,7 @@ if __name__ == "__main__":
     reduced_occupancy = skimage.measure.block_reduce(occupancy_image, (5, 5), np.max)
     # cv2.imshow('reduced occupancy', reduced_occupancy)
     dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((7, 7), np.uint8))
-    vf = ValueFunction(1, len(occupancy_image), len(occupancy_image[0]), zipper_gen([1]))
+    vf = ValueFunction(1, len(dilated_occupancy), len(dilated_occupancy[0]), zipper_gen([1]))
 
     #info0 = get_gen([[1, 2, 3, 4, 5], [4, 5, 6, 7, 8], [7, 8, 9, 10, 11], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
     #info1 = get_gen([[5, 4, 3, 2, 1], [8, 7, 6, 5, 4], [11, 10, 9, 8, 7], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
