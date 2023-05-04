@@ -17,7 +17,7 @@ dropping = 2
 picking = 3
 recharge = 4
 returning = 5
-done = 6
+mission_complete = 6
 
 class TaskPlanner:
     
@@ -84,13 +84,13 @@ class TaskPlanner:
         if is_reached.data:
             if self.state == flying:
                 self.current_sensor += 1
-            if self.state == returning and self.current_sensor == len(self.placements):
-                if self.has_probe:
+            if self.state == returning and self.current_sensor == len(self.placements): #gone through sensor list
+                if self.has_probe: #returned to base after picking up the last sensor
                     self.final_drop = True
                     self.set_state(dropping)
-                    return
-                self.current_sensor = 0
-                self.set_state(flying)
+                else: #returned to base after placing the last sensor
+                    self.current_sensor = 0
+                    self.set_state(flying)
             elif self.has_probe:
                 self.set_state(dropping)
             else:
@@ -105,7 +105,7 @@ class TaskPlanner:
         if done.data:
             self.has_probe = not self.has_probe
             if self.final_drop:
-                self.set_state(done)
+                self.set_state(mission_complete)
                 return
             if self.prev_state == flying:
                 self.set_state(returning)
