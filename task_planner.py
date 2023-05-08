@@ -48,6 +48,7 @@ class TaskPlanner:
         self.place_sensor_pub = rospy.Publisher('/place_sensor', Bool, queue_size=1)
         self.pickup_sensor_pub = rospy.Publisher('/pickup_sensor', Bool, queue_size=1)
         self.state_pub = rospy.Publisher('/state', Int16, queue_size=1)
+        self.state_pub = rospy.Publisher('/prev_state', Int16, queue_size=1)
         # ROS subscribers to run this script
         self.odom_sub = rospy.Subscriber('/ground_truth/state', Odometry, self.tick)
         self.done_travelling_sub = rospy.Subscriber('done_travelling', Bool, self.waypoint_reached)
@@ -59,9 +60,15 @@ class TaskPlanner:
         wrapper.data = self.state
         self.state_pub.publish(wrapper)
 
+    def publish_prev_state(self):
+        wrapper = Int16()
+        wrapper.data = self.state
+        self.state_pub.publish(wrapper)
+
     def tick(self, odom):
         #state machine logic goes here
         self.publish_state()
+        self.publish_prev_state()
         self.publish_occupancy()
         #self.publish_occupancy()
         if self.state == starting:
