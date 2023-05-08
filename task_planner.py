@@ -60,6 +60,7 @@ class TaskPlanner:
         self.publish_state()
         #self.publish_occupancy()
         if self.state == starting:
+            print("Generating Placements")
             self.placements = self.eval.get_placements()
             self.publish_occupancy()
             self.set_state(flying)
@@ -150,13 +151,29 @@ class TaskPlanner:
         self.prev_state = self.state
         self.state = new_state
 
+# Functions for testing purposes
+def grid_to_meters(world_dims: tuple, max_row: int, max_col: int, row: int, col: int) -> tuple:
+    """
+    Takes in a grid coordinate and returns a location in meters.
+
+    Parameters:
+    row, col (int): a row, col location in the discretized state space
+
+    Returns:
+    x, y (float): a x, y location in the continuous state space
+    """
+    min_x, max_x, min_y, max_y = world_dims
+    x = (max_x - min_x)*row/max_row + min_x
+    y = (max_y - min_y)*col/max_col + min_y
+    return x, y
+
 if __name__ == "__main__":
     path = 'occupancy_grids/images/rolling_hills_map_10.png'
     occupancy_image = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2GRAY)
     # cv2.imshow("original occupancy", occupancy_image)
     reduced_occupancy = skimage.measure.block_reduce(occupancy_image, (5, 5), np.max)
     # cv2.imshow('reduced occupancy', reduced_occupancy)
-    dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((13, 13), np.uint8))
+    dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((7, 7), np.uint8))
     vf = ValueFunction(1, len(dilated_occupancy), len(dilated_occupancy[0]), zipper_gen([1]))
 
     #info0 = get_gen([[1, 2, 3, 4, 5], [4, 5, 6, 7, 8], [7, 8, 9, 10, 11], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
