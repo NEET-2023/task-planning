@@ -38,5 +38,5 @@ def get_gen(map):
 
 def neg_get_gen(map):
     def get_value(x,y):
-        return -map[x][y]
+        return -int(map[x][y])
     return get_value
