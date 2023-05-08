@@ -10,7 +10,7 @@ occupancy_image = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2GRAY)
 reduced_occupancy = skimage.measure.block_reduce(occupancy_image, (5, 5), np.max)
 # cv2.imshow('reduced occupancy', reduced_occupancy)
 dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((7, 7), np.uint8))
-vf = ValueFunction(2, len(occupancy_image), len(occupancy_image[0]), zipper_gen([0.4, 0.6]))
+vf = ValueFunction(2, len(dilated_occupancy), len(dilated_occupancy[0]), zipper_gen([0.4, 0.6]))
 
 info0 = sin_gen(100, 1, 2)
 info1 = planar_gen(1, 2, 100, -100)
