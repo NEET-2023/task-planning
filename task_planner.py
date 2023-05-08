@@ -62,11 +62,11 @@ class TaskPlanner:
     def tick(self, odom):
         #state machine logic goes here
         self.publish_state()
+        self.publish_occupancy()
         #self.publish_occupancy()
         if self.state == starting:
             print("Generating Placements")
             self.placements = self.eval.get_placements()
-            self.publish_occupancy()
             self.set_state(flying)
             return
         if self.state == flying:
