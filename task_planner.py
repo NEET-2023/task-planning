@@ -19,6 +19,10 @@ recharge = 4
 returning = 5
 mission_complete = 6
 
+world_dims = (-100, 100, -100, 100)
+max_row = 0
+max_col = 0
+
 class TaskPlanner:
     
     def __init__(self, eval: Evaluator):
@@ -123,8 +127,10 @@ class TaskPlanner:
 
     def publish_next(self):
         waypoint = Point()
-        waypoint.x = self.placements[self.current_sensor][0] - 100
-        waypoint.y = self.placements[self.current_sensor][1] - 100
+        (x, y) = (self.placements[self.current_sensor][0], self.placements[self.current_sensor][1])
+        (new_x, new_y) = grid_to_meters(world_dims, max_row, max_col, x, y)
+        waypoint.x = new_x
+        waypoint.y = new_y
         waypoint.z = 0
         self.publish_waypoint(waypoint)
 
@@ -181,6 +187,7 @@ if __name__ == "__main__":
     #vf.apply_func(info0, 0)
     #vf.apply_func(info1, 1)
     eval = Evaluator(vf, 2, dilated_occupancy)
+    max_row, max_col = np.array(dilated_occupancy.shape) - 1
 
     try:
         # create the navigator object, pass in important mapping information
