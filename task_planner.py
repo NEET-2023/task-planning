@@ -25,7 +25,7 @@ max_col = 0
 
 class TaskPlanner:
     
-    def __init__(self, eval: Evaluator):
+    def __init__(self, eval: Evaluator, motion_occupancy):
         self.home = Point()
         self.home.x = 0
         self.home.y = 0
@@ -41,6 +41,7 @@ class TaskPlanner:
         self.placements = []
         self.current_sensor = 0
         self.eval = eval
+        self.motion_occupancy = motion_occupancy
         self.variables, self.height, self.width = eval.get_dims()
         # ROS publishers to execute other nodes
         self.map_pub = rospy.Publisher('/map_topic', OccupancyGrid, queue_size=1)
@@ -150,7 +151,7 @@ class TaskPlanner:
         northwest.y = self.westedge
         northwest.z = 0
         grid = OccupancyGrid()
-        occupancy = self.eval.get_occupancy()
+        occupancy = self.motion_occupancy
         for row in occupancy:
             for value in row:
                 grid.data.append(int(value/3))
@@ -186,6 +187,7 @@ if __name__ == "__main__":
     # cv2.imshow("original occupancy", occupancy_image)
     reduced_occupancy = skimage.measure.block_reduce(occupancy_image, (5, 5), np.max)
     # cv2.imshow('reduced occupancy', reduced_occupancy)
+    motion_dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((7, 7), np.uint8))
     dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((13, 13), np.uint8))
     vf = ValueFunction(1, len(dilated_occupancy), len(dilated_occupancy[0]), zipper_gen([1]))
 
@@ -199,7 +201,7 @@ if __name__ == "__main__":
     try:
         # create the navigator object, pass in important mapping information
         rospy.init_node('task_planner', anonymous=True)
-        PLANNER = TaskPlanner(eval)
+        PLANNER = TaskPlanner(eval, motion_dilated_occupancy)
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
