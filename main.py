@@ -4,6 +4,7 @@ from evaluator import *
 import skimage.measure
 import cv2
 
+
 path = 'occupancy_grids/images/rolling_hills_map_10.png'
 occupancy_image = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2GRAY)
 # cv2.imshow("original occupancy", occupancy_image)

@@ -49,7 +49,8 @@ class TaskPlanner:
         self.place_sensor_pub = rospy.Publisher('/place_sensor', Bool, queue_size=1)
         self.pickup_sensor_pub = rospy.Publisher('/pickup_sensor', Bool, queue_size=1)
         self.state_pub = rospy.Publisher('/state', Int16, queue_size=1)
-        self.state_pub = rospy.Publisher('/prev_state', Int16, queue_size=1)
+        self.prev_state_pub = rospy.Publisher('/prev_state', Int16, queue_size=1)
+        self.pod_index_pub = rospy.Publisher('/pod_index', Int16, queue_size=1)
         # ROS subscribers to run this script
         self.odom_sub = rospy.Subscriber('/ground_truth/state', Odometry, self.tick)
         self.done_travelling_sub = rospy.Subscriber('done_travelling', Bool, self.waypoint_reached)
@@ -64,12 +65,18 @@ class TaskPlanner:
     def publish_prev_state(self):
         wrapper = Int16()
         wrapper.data = self.state
-        self.state_pub.publish(wrapper)
+        self.prev_state_pub.publish(wrapper)
+
+    def publish_pod_index(self):
+        wrapper = Int16()
+        wrapper.data = self.current_sensor
+        self.pod_index_pub.publish(wrapper)
 
     def tick(self, odom):
         #state machine logic goes here
         self.publish_state()
         self.publish_prev_state()
+        self.publish_pod_index()
         self.publish_occupancy()
         #self.publish_occupancy()
         if self.state == starting:
@@ -191,7 +198,7 @@ if __name__ == "__main__":
     dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((13, 13), np.uint8))
     vf = ValueFunction(1, len(dilated_occupancy), len(dilated_occupancy[0]), zipper_gen([1]))
 
-    #info0 = get_gen([[1, 2, 3, 4, 5], [4, 5, 6, 7, 8], [7, 8, 9, 10, 11], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
+    #info0 = grad_gen(x, y, 0.5)
     #info1 = get_gen([[5, 4, 3, 2, 1], [8, 7, 6, 5, 4], [11, 10, 9, 8, 7], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
     #vf.apply_func(info0, 0)
     #vf.apply_func(info1, 1)
