@@ -196,7 +196,7 @@ if __name__ == "__main__":
     # cv2.imshow('reduced occupancy', reduced_occupancy)
     motion_dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((7, 7), np.uint8))
     dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((11, 11), np.uint8))
-    vf = ValueFunction(1, len(dilated_occupancy), len(dilated_occupancy[0]), zipper_gen([1]))
+    vf = ValueFunction(2, len(dilated_occupancy), len(dilated_occupancy[0]), zipper_gen([0.4, 0.6]))
 
     info0 = sin_gen(100, 1, 2, 0.1, 0.1)
     info1 = planar_gen(0, 0, 100, 100)
