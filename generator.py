@@ -21,9 +21,9 @@ def set_func(bad_x,bad_y, value):
             return 0
     return set
 
-def sin_gen(scalar, shiftx, shifty):
+def sin_gen(scalar, shiftx, shifty, dilx, dily):
     def sinfnc(x,y):
-        return scalar * (math.sin(x + shiftx) + math.sin(y + shifty))
+        return scalar * (math.sin(x*dilx + shiftx) + math.sin(y*dily + shifty))
     return sinfnc
 
 def planar_gen(a, b, shiftx, shifty):

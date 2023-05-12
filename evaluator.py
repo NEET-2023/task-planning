@@ -2,8 +2,9 @@ from generator import *
 from valuefunction import *
 
 class Evaluator:
-    def __init__(self, vf: ValueFunction, sensors: int, occupancy):
+    def __init__(self, vf: ValueFunction, sensors: int, occupancy, gradient_drop):
         self.vf = vf
+        self.grafient_drop = gradient_drop
         self.sensors = sensors
         self.variables, self.height, self.width = vf.get_dims()
         self.occupancy = occupancy
@@ -13,7 +14,7 @@ class Evaluator:
 
     def place_one(self):
         x, y, val = self.vf.best_coords()
-        place = grad_gen(x, y, -1)
+        place = grad_gen(x, y, -self.grafient_drop)
         self.vf.apply_func_all(place)
         self.placements[x, y] = 1
 
@@ -29,6 +30,9 @@ class Evaluator:
     
     def print_map(self):
         self.vf.print_map()
+
+    def paint_map(self):
+        self.vf.paint_map()
     
     def get_dims(self):
         return self.vf.get_dims()

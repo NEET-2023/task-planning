@@ -1,5 +1,5 @@
 import numpy as np
-from PIL import *
+from PIL import Image
 
 class ValueFunction:
     def __init__(self, variables: int, height: int, width: int, zipper):
@@ -44,13 +44,18 @@ class ValueFunction:
             print("")
         print("")
     
-    def num_to_rgb(num):
+    def num_to_rgb(self, num):
         num += 384
-        return (min(max(0, (num - 512)), 256), min(max(0, (num - 256)), 256), min(max(0, num), 256))
+        num = int(num)
+        a = min(max(0, (num - 512)), 256)
+        b = min(max(0, (num - 256)), 256)
+        c = min(max(0, num), 256)
+        return (b, a, c)
 
     def paint_map(self):
         img  = Image.new( mode = "RGB", size = (self.width, self.height) )
         for i in range(self.height):
             for j in range(self.width):
                 value = self.zipper(self.map[:, i, j])
+                img.putpixel((j, i), self.num_to_rgb(value))
         img.show()

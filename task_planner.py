@@ -195,14 +195,18 @@ if __name__ == "__main__":
     reduced_occupancy = skimage.measure.block_reduce(occupancy_image, (5, 5), np.max)
     # cv2.imshow('reduced occupancy', reduced_occupancy)
     motion_dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((7, 7), np.uint8))
-    dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((13, 13), np.uint8))
+    dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((11, 11), np.uint8))
     vf = ValueFunction(1, len(dilated_occupancy), len(dilated_occupancy[0]), zipper_gen([1]))
 
-    #info0 = grad_gen(x, y, 0.5)
-    #info1 = get_gen([[5, 4, 3, 2, 1], [8, 7, 6, 5, 4], [11, 10, 9, 8, 7], [1, 2, 3, 4, 5], [4, 5, 6, 7, 8]])
-    #vf.apply_func(info0, 0)
-    #vf.apply_func(info1, 1)
-    eval = Evaluator(vf, 2, dilated_occupancy)
+    info0 = sin_gen(100, 1, 2, 0.1, 0.1)
+    info1 = planar_gen(0, 0, 100, 100)
+    poi1 = grad_gen(250, 200, 300)
+    poi2 = grad_gen(260, 175, 300)
+    vf.apply_func(info0, 0)
+    vf.apply_func(info1, 1)
+    vf.apply_func(poi1, 0)
+    vf.apply_func(poi2, 1)
+    eval = Evaluator(vf, 5, dilated_occupancy, 1000)
     max_row, max_col = np.array(dilated_occupancy.shape) - 1
 
     try:
