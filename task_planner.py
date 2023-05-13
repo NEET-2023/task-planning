@@ -198,7 +198,7 @@ if __name__ == "__main__":
     dilated_occupancy = cv2.dilate(reduced_occupancy, np.ones((11, 11), np.uint8))
     vf = ValueFunction(2, len(dilated_occupancy), len(dilated_occupancy[0]), zipper_gen([0.4, 0.6]))
 
-    info0 = sin_gen(100, 1, 2, 0.1, 0.1)
+    info0 = sin_gen(100, 1, 2, 0.1, 0.09)
     info1 = planar_gen(0, 0, 100, 100)
     poi1 = grad_gen(250, 200, 300)
     poi2 = grad_gen(260, 175, 300)
