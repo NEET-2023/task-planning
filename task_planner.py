@@ -104,9 +104,7 @@ class TaskPlanner:
         if is_reached.data:
             if self.state == dropping or self.state == picking:
                 return
-            if self.state == returning:
-                self.current_sensor += 1
-            if self.state == returning and self.current_sensor == len(self.placements): #gone through sensor list
+            if self.state == returning and self.current_sensor == len(self.placements - 1): #gone through sensor list
                 if self.has_probe: #returned to base after picking up the last sensor
                     self.final_drop = True
                     self.set_state(dropping)
@@ -125,6 +123,8 @@ class TaskPlanner:
 
     def done_dilly_dallying(self, done):
         if done.data:
+            if self.state == dropping:
+                self.current_sensor += 1
             if self.state == dropping or self.state == picking:
                 self.has_probe = not self.has_probe
             if self.final_drop:
