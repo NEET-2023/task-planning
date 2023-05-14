@@ -56,6 +56,7 @@ class TaskPlanner:
         self.done_travelling_sub = rospy.Subscriber('done_travelling', Bool, self.waypoint_reached)
         self.sensor_placed_sub = rospy.Subscriber('/sensor_placed', Bool, self.done_dilly_dallying)
         self.sensor_pickedup_sub = rospy.Subscriber('/sensor_pickedup', Bool, self.done_dilly_dallying)
+        self.compute_occupancy()
 
     def publish_state(self):
         wrapper = Int16()
@@ -152,7 +153,7 @@ class TaskPlanner:
     def publish_waypoint(self, waypoint):
         self.waypoint_pub.publish(waypoint)
 
-    def publish_occupancy(self):
+    def compute_occupancy(self):
         northwest = Point()
         northwest.x = self.northedge
         northwest.y = self.westedge
@@ -166,7 +167,10 @@ class TaskPlanner:
         grid.info.width = self.width
         grid.info.height = self.height
         grid.info.origin.position = northwest
-        self.map_pub.publish(grid)
+        self.grid = grid
+
+    def publish_occupancy(self):
+        self.map_pub.publish(self.grid)
     
     def set_state(self, new_state):
         self.prev_state = self.state
