@@ -104,7 +104,7 @@ class TaskPlanner:
         if is_reached.data:
             if self.state == dropping or self.state == picking:
                 return
-            if self.state == returning and self.current_sensor == len(self.placements - 1): #gone through sensor list
+            if self.state == returning and self.current_sensor == len(self.placements)-1: #gone through sensor list
                 if self.has_probe: #returned to base after picking up the last sensor
                     self.final_drop = True
                     self.set_state(dropping)
