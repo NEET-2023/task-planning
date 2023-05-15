@@ -52,10 +52,10 @@ class TaskPlanner:
         self.prev_state_pub = rospy.Publisher('/prev_state', Int16, queue_size=1)
         self.pod_index_pub = rospy.Publisher('/pod_index', Int16, queue_size=1)
         # ROS subscribers to run this script
-        self.odom_sub = rospy.Subscriber('/ground_truth/state', Odometry, self.tick)
-        self.done_travelling_sub = rospy.Subscriber('done_travelling', Bool, self.waypoint_reached)
-        self.sensor_placed_sub = rospy.Subscriber('/sensor_placed', Bool, self.done_dilly_dallying)
-        self.sensor_pickedup_sub = rospy.Subscriber('/sensor_pickedup', Bool, self.done_dilly_dallying)
+        self.odom_sub = rospy.Subscriber('/ground_truth/state', Odometry, self.tick, queue_size=1)
+        self.done_travelling_sub = rospy.Subscriber('done_travelling', Bool, self.waypoint_reached, queue_size=1)
+        self.sensor_placed_sub = rospy.Subscriber('/sensor_placed', Bool, self.done_dilly_dallying, queue_size=1)
+        self.sensor_pickedup_sub = rospy.Subscriber('/sensor_pickedup', Bool, self.done_dilly_dallying, queue_size=1)
         self.compute_occupancy()
 
     def publish_state(self):
